@@ -10,7 +10,7 @@ import java.util.logging.Logger;
 
 public class Main {
 
-    //    private static int[][] arr = { {4, 8, 7, 3},
+//        private static int[][] arr = { {4, 8, 7, 3},
 //                                    {2, 5, 9, 3},
 //                                    {6, 3, 2, 5},
 //                                    {4, 4, 1, 6} };
@@ -22,7 +22,6 @@ public class Main {
     public static void main(String[] args) {
 
         readFile();
-//        bestPath = getPath(1, 2);
         for (int i = 0 ; i<row ; i++)
             for (int j = 0; j<column ; j++){
                 List<int[]> path = getPath(i,j);
@@ -48,8 +47,7 @@ public class Main {
 
     }
 
-    //TODO: issue when 2 directions are workable but one is overridden by the latter
-    //      changing traversal order will change the result
+
     public static List<int[]> getPath(int x, int y) {
 
         List<int[]> path = new ArrayList<int[]>();
@@ -60,12 +58,20 @@ public class Main {
             currentPath = getPath(x - 1, y);
             if (currentPath.size() > path.size())
                 path = currentPath;
+            //if 2 paths have the same lengths then compare their drops
+            //this should fix the issue where latter if condition override its previous one
+            else if (currentPath.size() == path.size() )
+                if (calDrop(currentPath) > calDrop(path))
+                    path = currentPath;
         }
         //go to lower box
         if (x < row-1 && arr[x][y] > arr[x + 1][y]) {
             currentPath = getPath(x + 1, y);
             if (currentPath.size() > path.size())
                 path = currentPath;
+            else if (currentPath.size() == path.size())
+                if (calDrop(currentPath) > calDrop(path))
+                    path = currentPath;
 
         }
         //go to left box
@@ -73,6 +79,9 @@ public class Main {
             currentPath = getPath(x, y - 1);
             if (currentPath.size() > path.size())
                 path = currentPath;
+            else if (currentPath.size() == path.size())
+                if (calDrop(currentPath) > calDrop(path))
+                    path = currentPath;
         }
 
         //go to right box
@@ -80,6 +89,9 @@ public class Main {
             currentPath = getPath(x, y + 1);
             if (currentPath.size() > path.size())
                 path = currentPath;
+            else if (currentPath.size() == path.size())
+                if (calDrop(currentPath) > calDrop(path))
+                    path = currentPath;
         }
         path.add(new int[]{x,y});
         return path;
@@ -117,9 +129,9 @@ public class Main {
 
     public static int calDrop(List<int[]> path){
         int pathLength = path.size();
-        //if there is just 1 item then return its value, used for assessment when finding path
+        //if there is just 1 item then assume there is 0 before it, used for assessment when finding path
         if (path.size()==1)
-            return arr[path.get(0)[0]][path.get(0)[1]];
+            return 0 - arr[path.get(0)[0]][path.get(0)[1]];
 
         return arr[path.get(pathLength-1)[0]][path.get(pathLength-1)[1]] - arr[path.get(0)[0]][path.get(0)[1]];
     }
